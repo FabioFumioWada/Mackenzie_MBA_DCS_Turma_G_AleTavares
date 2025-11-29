@@ -215,3 +215,4 @@ with open("tema_b_sensores_iot.csv", "w", newline="", encoding="utf-8") as f:
 
 **Última Atualização:** Novembro 2025  
 **Versão do Dataset:** 1.0
+**Turma G:** 1.0
