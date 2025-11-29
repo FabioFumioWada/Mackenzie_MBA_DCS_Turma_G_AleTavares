@@ -1,29 +1,70 @@
 {
-  "name": "PySpark para Análise de Dados",
-  "dockerComposeFile": "../docker-compose.yml",
-  "service": "spark-tema-b",
-  "workspaceFolder": "/app",
+  "name": "Tema B - Otimização de Armazenamento (PySpark)",
+  
+  // Usar Dockerfile diretamente (mais compatível com Codespaces)
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
 
+  // Diretório de trabalho no container
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+
+  // Configurações do VS Code
   "customizations": {
     "vscode": {
       "settings": {
-        "python.defaultInterpreterPath": "/usr/local/bin/python",
-        "python.linting.pylintEnabled": true,
-        "python.linting.enabled": true
+        "python.defaultInterpreterPath": "/usr/bin/python3.11",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": false,
+        "python.formatting.provider": "black",
+        "terminal.integrated.defaultProfile.linux": "bash"
       },
       "extensions": [
         "ms-python.python",
         "ms-python.vscode-pylance",
-        "ms-toolsai.jupyter",
-        "njpwerner.autodocstring",
-        "donjayamanne.githistory"
+        "ms-toolsai.jupyter"
       ]
     }
   },
 
-  "postCreateCommand": "echo \"Ambiente Spark pronto! Execute a análise com: python3 /app/scripts/tema_b_otimizacao_docker.py\"",
+  // Comandos pós-criação
+  "postCreateCommand": "bash -c 'echo \"✅ Ambiente pronto!\" && echo \"\" && echo \"Para executar a análise:\" && echo \"  ./run.sh full\" && echo \"\" && echo \"Ou manualmente:\" && echo \"  python3 /workspace/scripts/tema_b_otimizacao_docker.py\"'",
 
-  "forwardPorts": [8080, 8888, 4040],
+  // Portas para encaminhar
+  "forwardPorts": [8080, 4040, 8888],
+  "portsAttributes": {
+    "8080": {
+      "label": "Spark Master UI",
+      "onAutoForward": "notify"
+    },
+    "4040": {
+      "label": "Spark Application UI",
+      "onAutoForward": "notify"
+    },
+    "8888": {
+      "label": "Jupyter (opcional)",
+      "onAutoForward": "ignore"
+    }
+  },
 
-  "remoteUser": "root"
+  // Features adicionais
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": false,
+      "installOhMyZsh": false,
+      "upgradePackages": false
+    }
+  },
+
+  // Usuário remoto
+  "remoteUser": "root",
+
+  // Variáveis de ambiente
+  "remoteEnv": {
+    "SPARK_HOME": "/opt/spark",
+    "PATH": "${containerEnv:PATH}:/opt/spark/bin:/opt/spark/sbin",
+    "PYTHONPATH": "/opt/spark/python:/opt/spark/python/lib/py4j-0.10.9.7-src.zip"
+  }
 }

@@ -7,7 +7,7 @@ PROJETO FINAL - TEMA B: OTIMIZAÇÃO DE ARMAZENAMENTO E CONSULTA
 Disciplina: Data Collection & Storage
 MBA em Engenharia de Dados
 
-Versão: Docker/GitHub Codespaces
+Versão: Docker/GitHub Codespaces v2.0
 Data: Novembro 2025
 
 Objetivo:
@@ -24,13 +24,11 @@ Tecnologias:
 - Python 3.11
 - Docker
 
-Arquitetura:
-------------
-[Dataset] → [CSV/JSON] → [Conversão] → [Parquet/ORC]
-                                              ↓
-                                    [Análise Performance]
-                                              ↓
-                                    [Estratégia Lifecycle]
+Novidades v2.0:
+---------------
+- Suporte a dataset pré-gerado (acelera execução)
+- Opção de gerar novo dataset ou usar existente
+- Melhor logging e relatórios
 
 ================================================================================
 """
@@ -53,8 +51,14 @@ from pyspark.sql.types import (
 # CONFIGURAÇÕES
 # ============================================================================
 
-# Diretórios (adaptados para Docker)
-BASE_DIR = Path("/app")
+# Diretórios (adaptados para Docker/Codespaces)
+# Detecta automaticamente se está em /app (docker-compose) ou /workspace (codespaces)
+import os
+if os.path.exists("/workspace"):
+    BASE_DIR = Path("/workspace")
+else:
+    BASE_DIR = Path("/app")
+
 DATA_DIR = BASE_DIR / "data"
 OUTPUT_DIR = BASE_DIR / "output"
 
@@ -63,15 +67,17 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Configurações do dataset
-DATASET_SIZE_MB = 600  # Tamanho alvo do dataset em MB
-NUM_RECORDS = 1_000_000  # Número de registros a gerar
+NUM_RECORDS = 1_000_000  # Número de registros
+DATASET_CSV_PATH = DATA_DIR / "tema_b_sensores_iot.csv"
+USE_PREGENERATED = True  # Usar dataset pré-gerado se disponível
 
 print("=" * 80)
-print("TEMA B - OTIMIZAÇÃO DE ARMAZENAMENTO E CONSULTA")
+print("TEMA B - OTIMIZAÇÃO DE ARMAZENAMENTO E CONSULTA v2.0")
 print("=" * 80)
 print(f"Diretório base: {BASE_DIR}")
 print(f"Diretório de dados: {DATA_DIR}")
 print(f"Diretório de saída: {OUTPUT_DIR}")
+print(f"Dataset pré-gerado: {'Sim' if USE_PREGENERATED and DATASET_CSV_PATH.exists() else 'Não'}")
 print()
 
 # ============================================================================
@@ -85,7 +91,7 @@ def criar_spark_session():
     print("Iniciando Spark Session...")
     
     spark = SparkSession.builder \
-        .appName("Tema B - Otimização Armazenamento (Docker)") \
+        .appName("Tema B - Otimização Armazenamento v2.0") \
         .config("spark.driver.memory", "4g") \
         .config("spark.executor.memory", "4g") \
         .config("spark.sql.adaptive.enabled", "true") \
@@ -104,19 +110,52 @@ def criar_spark_session():
 
 
 # ============================================================================
-# ETAPA 1: GERAÇÃO DE DATASET
+# ETAPA 1: CARREGAR OU GERAR DATASET
 # ============================================================================
+
+def carregar_ou_gerar_dataset(spark):
+    """
+    Carrega dataset pré-gerado ou gera um novo.
+    """
+    print("=" * 80)
+    print("ETAPA 1: OBTENÇÃO DO DATASET")
+    print("=" * 80)
+    
+    # Verificar se dataset pré-gerado existe
+    if USE_PREGENERATED and DATASET_CSV_PATH.exists():
+        print(f"Dataset pré-gerado encontrado: {DATASET_CSV_PATH}")
+        print("Carregando dataset...")
+        
+        start_time = time.time()
+        
+        # Carregar CSV com schema inferido
+        df = spark.read \
+            .option("header", "true") \
+            .option("inferSchema", "true") \
+            .csv(str(DATASET_CSV_PATH))
+        
+        elapsed = time.time() - start_time
+        count = df.count()
+        
+        print(f"✓ Dataset carregado: {count:,} registros")
+        print(f"✓ Tempo de carregamento: {elapsed:.2f}s")
+        print(f"✓ Colunas: {', '.join(df.columns)}")
+        print()
+        
+        return df
+    
+    else:
+        print("Dataset pré-gerado não encontrado. Gerando novo dataset...")
+        return gerar_dataset_iot(spark)
+
 
 def gerar_dataset_iot(spark, num_records=NUM_RECORDS):
     """
-    Gera dataset de sensores IoT.
+    Gera dataset de sensores IoT do zero.
     
     Cenário: Rede de monitoramento ambiental com sensores de temperatura,
     umidade, pressão, CO2 e luminosidade.
     """
-    print("=" * 80)
-    print("ETAPA 1: GERAÇÃO DE DATASET")
-    print("=" * 80)
     print(f"Gerando {num_records:,} registros de sensores IoT...")
     
     start_time = time.time()
@@ -182,6 +221,17 @@ def gerar_dataset_iot(spark, num_records=NUM_RECORDS):
     print(f"✓ Dataset gerado: {df.count():,} registros")
     print(f"✓ Tempo de geração: {elapsed:.2f}s")
     print(f"✓ Schema: {len(df.columns)} colunas")
+    
+    # Salvar CSV para uso futuro
+    print(f"Salvando dataset em: {DATASET_CSV_PATH}")
+    df.coalesce(1).write.mode("overwrite").option("header", "true").csv(str(DATASET_CSV_PATH.parent / "temp_csv"))
+    # Mover arquivo gerado para o nome correto
+    import shutil
+    temp_files = list((DATASET_CSV_PATH.parent / "temp_csv").glob("*.csv"))
+    if temp_files:
+        shutil.move(str(temp_files[0]), str(DATASET_CSV_PATH))
+        shutil.rmtree(str(DATASET_CSV_PATH.parent / "temp_csv"))
+    print(f"✓ Dataset salvo em: {DATASET_CSV_PATH}")
     print()
     
     return df
@@ -201,7 +251,7 @@ def salvar_em_formatos(df, base_path):
     
     resultados = {}
     
-    # 1. CSV
+    # 1. CSV (se não for o dataset original)
     print("Salvando em CSV...")
     start = time.time()
     csv_path = f"{base_path}/csv"
@@ -410,8 +460,8 @@ def main():
         # 1. Criar Spark Session
         spark = criar_spark_session()
         
-        # 2. Gerar dataset
-        df = gerar_dataset_iot(spark, NUM_RECORDS)
+        # 2. Carregar ou gerar dataset
+        df = carregar_ou_gerar_dataset(spark)
         
         # 3. Salvar em múltiplos formatos
         formatos_info = salvar_em_formatos(df, str(DATA_DIR))

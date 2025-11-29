@@ -17,11 +17,19 @@ Este pacote contém uma solução completa e containerizada do **Tema B: Otimiza
 
 - Script Python otimizado para execução em container
 - Caminhos de arquivo adaptados para `/app`
-- Geração de dataset de 1 milhão de registros
+- Suporte a dataset pré-gerado (acelera execução)
 - Análise comparativa de 4 formatos (CSV, JSON, Parquet, ORC)
 - Relatório JSON automático
 
-### 3. ✅ Documentação Completa
+### 3. ✅ Dataset Pré-Gerado Incluído
+
+- **1 milhão de registros** de sensores IoT (~87 MB)
+- Documentação completa em `data/DATASET_INFO.md`
+- Acelera execução de ~10min para ~3-5min
+- Resultados reproduzíveis e validáveis
+- Seed fixo (42) para consistência
+
+### 4. ✅ Documentação Completa
 
 - **README.md:** Visão geral do projeto
 - **INSTRUCOES.md:** Guia passo a passo de execução
@@ -29,7 +37,7 @@ Este pacote contém uma solução completa e containerizada do **Tema B: Otimiza
 - **PUBLICACAO_GITHUB.md:** Guia de publicação no GitHub
 - **run.sh:** Script de automação
 
-### 4. ✅ Configuração GitHub Codespaces
+### 5. ✅ Configuração GitHub Codespaces
 
 - **`.devcontainer/devcontainer.json`:** Configuração automática
 - Extensões VS Code pré-instaladas

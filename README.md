@@ -41,6 +41,18 @@ graph TD
     L -- Salva em --> M[output/relatorio.json]
 ```
 
+## 📊 Dataset Incluído
+
+Este projeto inclui um **dataset pré-gerado** de 1 milhão de registros (~87 MB) para acelerar a execução:
+
+- **Arquivo:** `data/tema_b_sensores_iot.csv`
+- **Registros:** 1.000.000 leituras de sensores IoT
+- **Tamanho:** ~87 MB
+- **Período:** Ano de 2024
+- **Documentação:** Veja `data/DATASET_INFO.md` para detalhes completos
+
+**Vantagem:** Ao usar o dataset pré-gerado, a execução leva apenas **~3-5 minutos** ao invés de ~10 minutos (geração + análise).
+
 ## 🛠️ Tecnologias Utilizadas
 
 - **Linguagem:** Python 3.11
@@ -82,6 +94,7 @@ graph TD
      ```bash
      python3 /app/scripts/tema_b_otimizacao_docker.py
      ```
+   - **Nota:** O script detecta automaticamente o dataset pré-gerado em `data/` e o utiliza, economizando tempo de geração.
 
 4. **Verificar os Resultados:**
    - O script irá gerar os datasets no diretório `/app/data` e o relatório final em `/app/output`.

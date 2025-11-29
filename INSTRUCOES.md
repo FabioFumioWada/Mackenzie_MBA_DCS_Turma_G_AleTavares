@@ -72,6 +72,21 @@ ls -la /opt/spark
 # Esperado: Diretório com arquivos do Spark 3.5.0
 ```
 
+### 3.3. Dataset Pré-Gerado
+
+Este projeto inclui um dataset pré-gerado de 1 milhão de registros em `data/tema_b_sensores_iot.csv`.
+
+**Vantagens:**
+- Execução mais rápida (~3-5 minutos vs ~10 minutos)
+- Resultados consistentes e reproduzíveis
+- Facilita validação pelo avaliador
+
+**Detalhes do Dataset:**
+- Veja `data/DATASET_INFO.md` para documentação completa
+- 1.000.000 registros de sensores IoT
+- 10 colunas (sensor_id, sensor_type, location, city, timestamp, value, unit, battery_level, signal_strength, status)
+- Tamanho: ~87 MB
+
 ### 3.3. Executar a Análise
 
 **Método 1: Script Automatizado (Recomendado)**
