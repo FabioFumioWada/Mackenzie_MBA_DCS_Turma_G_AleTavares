@@ -1,12 +1,12 @@
 # Dockerfile para Tema B - Otimização de Armazenamento com PySpark
-# Base: Python 3.11 com Java 17 (compatível com Spark 3.5.0)
+# Base: Python 3.11 com Debian Bookworm (estável, tem Java disponível)
 
-FROM python:3.11-slim
+FROM python:3.11-bookworm
 
 # Metadados
 LABEL maintainer="MBA Engenharia de Dados"
 LABEL description="Ambiente PySpark para análise de formatos de armazenamento"
-LABEL version="2.0"
+LABEL version="3.0"
 
 # Variáveis de ambiente
 ENV DEBIAN_FRONTEND=noninteractive
@@ -18,7 +18,7 @@ ENV PYSPARK_PYTHON=python3
 ENV PYSPARK_DRIVER_PYTHON=python3
 
 # Instalar dependências do sistema
-# Nota: Java 17 é usado porque Java 11 não está disponível no Debian Trixie
+# Usando Debian Bookworm que tem Java 17 disponível
 RUN apt-get update && apt-get install -y \
     openjdk-17-jdk \
     wget \
