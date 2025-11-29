@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  spark-tema-b:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tema-b-otimizacao
+    hostname: spark-master
+    
+    # Volumes para persistência de dados
+    volumes:
+      - ./data:/app/data
+      - ./scripts:/app/scripts
+      - ./output:/app/output
+      - ./notebooks:/app/notebooks
+    
+    # Variáveis de ambiente
+    environment:
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark-master
+      - SPARK_MASTER_PORT=7077
+      - SPARK_MASTER_WEBUI_PORT=8080
+      - PYSPARK_PYTHON=python3
+      - PYSPARK_DRIVER_PYTHON=python3
+    
+    # Portas expostas
+    ports:
+      - "8080:8080"  # Spark Master Web UI
+      - "7077:7077"  # Spark Master
+      - "8888:8888"  # Jupyter Notebook (opcional)
+      - "4040:4040"  # Spark Application UI
+    
+    # Manter container rodando
+    stdin_open: true
+    tty: true
+    
+    # Comando padrão: bash interativo
+    command: /bin/bash
+    
+    # Configurações de recursos (ajuste conforme necessário)
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G
+        reservations:
+          cpus: '2'
+          memory: 4G
+    
+    # Rede
+    networks:
+      - spark-network
+
+networks:
+  spark-network:
+    driver: bridge

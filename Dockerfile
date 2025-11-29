@@ -1,0 +1,58 @@
+# Dockerfile para Tema B - Otimização de Armazenamento com PySpark
+# Base: Python 3.11 com Java 11 (necessário para Spark)
+
+FROM python:3.11-slim
+
+# Metadados
+LABEL maintainer="MBA Engenharia de Dados"
+LABEL description="Ambiente PySpark para análise de formatos de armazenamento"
+LABEL version="1.0"
+
+# Variáveis de ambiente
+ENV DEBIAN_FRONTEND=noninteractive
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV SPARK_HOME=/opt/spark
+ENV PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+ENV PYTHONUNBUFFERED=1
+ENV PYSPARK_PYTHON=python3
+ENV PYSPARK_DRIVER_PYTHON=python3
+
+# Instalar dependências do sistema
+RUN apt-get update && apt-get install -y \
+    openjdk-11-jdk \
+    wget \
+    curl \
+    procps \
+    && rm -rf /var/lib/apt/lists/*
+
+# Baixar e instalar Apache Spark 3.5.0
+RUN wget -q https://archive.apache.org/dist/spark/spark-3.5.0/spark-3.5.0-bin-hadoop3.tgz \
+    && tar -xzf spark-3.5.0-bin-hadoop3.tgz \
+    && mv spark-3.5.0-bin-hadoop3 /opt/spark \
+    && rm spark-3.5.0-bin-hadoop3.tgz
+
+# Instalar bibliotecas Python
+RUN pip install --no-cache-dir \
+    pyspark==3.5.0 \
+    pandas==2.1.3 \
+    numpy==1.26.2 \
+    matplotlib==3.8.2 \
+    seaborn==0.13.0 \
+    jupyter==1.0.0 \
+    notebook==7.0.6
+
+# Criar diretório de trabalho
+WORKDIR /app
+
+# Copiar arquivos do projeto
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Criar diretórios necessários
+RUN mkdir -p /app/data /app/output /app/scripts /app/notebooks
+
+# Expor porta para Jupyter (opcional)
+EXPOSE 8888
+
+# Comando padrão
+CMD ["/bin/bash"]

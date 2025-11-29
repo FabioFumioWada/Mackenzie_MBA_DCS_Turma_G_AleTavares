@@ -1,0 +1,29 @@
+{
+  "name": "PySpark para Análise de Dados",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "spark-tema-b",
+  "workspaceFolder": "/app",
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.linting.pylintEnabled": true,
+        "python.linting.enabled": true
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "njpwerner.autodocstring",
+        "donjayamanne.githistory"
+      ]
+    }
+  },
+
+  "postCreateCommand": "echo \"Ambiente Spark pronto! Execute a análise com: python3 /app/scripts/tema_b_otimizacao_docker.py\"",
+
+  "forwardPorts": [8080, 8888, 4040],
+
+  "remoteUser": "root"
+}
