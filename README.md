@@ -2,7 +2,15 @@
 
 **MBA em Engenharia de Dados - Data Collection & Storage**
 
-Este projeto demonstra a importância da otimização de armazenamento e consulta em um ambiente de Big Data, comparando diferentes formatos de arquivo e propondo uma estratégia de ciclo de vida de dados. A solução foi totalmente containerizada com Docker para garantir reprodutibilidade e facilidade de uso no GitHub Codespaces.
+Este projeto realiza uma comparação entre formatos de arquvivos para demonstrar a importância da otimização de armazenamento e consulta em um ambiente de Big Data, propondo uma estratégia de ciclo de vida de dados. A solução foi totalmente desenvolvida com Docker e GitHub Codespaces.
+
+**Alunos:**
+**Fabio Fumio Wada – RA 10741479**
+**Sweeli Suzuki – RA 10423319**
+**Tatiane Silva Santos  – RA 10747108**
+
+**Prof: Alexandre Tavares**
+
 
 ## 🚀 Objetivos
 
@@ -11,54 +19,21 @@ Este projeto demonstra a importância da otimização de armazenamento e consult
 - **Propor Ciclo de Vida:** Desenvolver uma estratégia de ciclo de vida (Hot, Warm, Cold) para otimizar custos.
 - **Containerizar Solução:** Empacotar a aplicação com Docker para execução em qualquer ambiente, incluindo GitHub Codespaces.
 
-## 📊 Arquitetura da Solução
-
-```mermaid
-graph TD
-    subgraph "Ambiente Docker"
-        A[Dockerfile] --> B(Imagem Docker com Spark 3.5.0)
-        C[docker-compose.yml] --> D{Container Spark}
-    end
-
-    subgraph "Pipeline de Análise"
-        E[Geração de Dataset] --> F{1M Registros IoT}
-        F --> G[Salvar em CSV]
-        F --> H[Salvar em JSON]
-        F --> I[Salvar em Parquet]
-        F --> J[Salvar em ORC]
-        
-        subgraph "Análise de Performance"
-            G --> K[Leitura e Queries]
-            H --> K
-            I --> K
-            J --> K
-        end
-        
-        K --> L[Relatório Comparativo]
-    end
-
-    D -- Monta volumes --> E
-    L -- Salva em --> M[output/relatorio.json]
-```
-
 ## 📊 Dataset Incluído
 
 Este projeto inclui um **dataset pré-gerado** de 1 milhão de registros (~87 MB) para acelerar a execução:
 
 - **Arquivo:** `data/tema_b_sensores_iot.csv`
 - **Registros:** 1.000.000 leituras de sensores IoT
-- **Tamanho:** ~87 MB
-- **Período:** Ano de 2024
-- **Documentação:** Veja `data/DATASET_INFO.md` para detalhes completos
-
-**Vantagem:** Ao usar o dataset pré-gerado, a execução leva apenas **~3-5 minutos** ao invés de ~10 minutos (geração + análise).
+- **Tamanho:** 87 MB
+- **Documentação:** `data/DATASET_INFO.md` 
 
 ## 🛠️ Tecnologias Utilizadas
 
 - **Linguagem:** Python 3.11
 - **Processamento:** Apache Spark 3.5.0
 - **Containerização:** Docker, Docker Compose
-- **Formatos Analisados:** CSV, JSON, Parquet (Snappy), ORC (Snappy)
+- **Formatos Analisados:** CSV, JSON, Parquet, ORC
 - **Bibliotecas Python:** PySpark, Pandas, Matplotlib, Seaborn
 
 ## 📁 Estrutura de Diretórios
@@ -80,53 +55,24 @@ Este projeto inclui um **dataset pré-gerado** de 1 milhão de registros (~87 MB
 
 ## 🚀 Como Executar no GitHub Codespaces
 
-1. **Abrir no Codespaces:**
-   - Clique no botão **"Code"** neste repositório.
-   - Selecione a aba **"Codespaces"**.
-   - Clique em **"Create codespace on main"**.
+EXECUÇÃO RÁPIDA (LOCAL):
+------------------------
+Se você tem Docker instalado, pode testar localmente:
 
-2. **Iniciar o Ambiente:**
-   - O GitHub Codespaces irá automaticamente construir e iniciar o container Docker usando os arquivos `Dockerfile` e `docker-compose.yml`.
-   - Aguarde a conclusão do processo. Você terá um terminal pronto para uso.
+1. **Executar a Análise:**
+  cd tema_b_github
+  ./run.sh full
 
-3. **Executar a Análise:**
-   - No terminal do Codespaces, execute o script principal:
-     ```bash
-     python3 /app/scripts/tema_b_otimizacao_docker.py
-     ```
-   - **Nota:** O script detecta automaticamente o dataset pré-gerado em `data/` e o utiliza, economizando tempo de geração.
+   Este comando executará dentro do container o comnando:
+      python3 /app/scripts/tema_b_otimizacao_docker.py
 
-4. **Verificar os Resultados:**
-   - O script irá gerar os datasets no diretório `/app/data` e o relatório final em `/app/output`.
-   - Você pode explorar os arquivos diretamente na interface do VS Code.
-   - Para visualizar o relatório:
-     ```bash
-     cat /app/output/relatorio_comparativo.json
-     ```
+2. **Verificar os Resultados:**
+   - Os resultados estarão nos diretórios `data/` e `output/`.
 
-## ⚙️ Como Executar Localmente (com Docker)
+3. **Gerar gráficos:**
+   - Executar no terminal os comandos do arquivo "pre_geracao_graficos_tema_b.txt"
+   - Excutar no terminal o comando "python3 /workspace/gerar_graficos.py"
 
-1. **Pré-requisitos:**
-   - Docker e Docker Compose instalados.
-
-2. **Construir e Iniciar o Container:**
-   ```bash
-   docker-compose up -d --build
-   ```
-
-3. **Acessar o Container:**
-   ```bash
-   docker-compose exec spark-tema-b bash
-   ```
-
-4. **Executar a Análise:**
-   - Dentro do container, execute o script:
-     ```bash
-     python3 /app/scripts/tema_b_otimizacao_docker.py
-     ```
-
-5. **Verificar os Resultados:**
-   - Os resultados estarão nos diretórios `data/` e `output/` no seu host local, pois foram montados como volumes.
 
 ## 📈 Resultados Esperados
 
@@ -164,7 +110,3 @@ O projeto também propõe uma estratégia de ciclo de vida para otimização de 
   - **Formato:** Parquet (GZIP)
   - **Custo:** Baixo
   - **Uso:** Conformidade regulatória e auditorias.
-
-## 📄 Licença
-
-Este projeto foi desenvolvido para fins educacionais como parte do Projeto Final do MBA em Engenharia de Dados.
