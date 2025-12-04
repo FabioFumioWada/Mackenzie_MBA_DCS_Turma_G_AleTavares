@@ -5,8 +5,8 @@
 Este projeto realiza uma comparação entre formatos de arquvivos para demonstrar a importância da otimização de armazenamento e consulta em um ambiente de Big Data, propondo uma estratégia de ciclo de vida de dados. A solução foi totalmente desenvolvida com Docker e GitHub Codespaces.
 
 **Alunos:**
-**Fabio Fumio Wada – RA 10741479**
-**Sweeli Suzuki – RA 10423319**
+**Fabio Fumio Wada – RA 10741479** /
+**Sweeli Suzuki – RA 10423319** /
 **Tatiane Silva Santos  – RA 10747108**
 
 **Prof: Alexandre Tavares**
